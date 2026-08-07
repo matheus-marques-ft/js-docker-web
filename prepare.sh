@@ -41,7 +41,7 @@ clients=(
     "${CLIENT_NAME}Client_${CLIENT_VERSION}_aarch64.dmg"
 )
 for client in "${clients[@]}"; do
-    wget "https://github.com/jumpserver/clients/releases/download/v${CLIENT_VERSION}/${client}"
+    wget "https://github.com/matheus-marques-ft/js-client/releases/download/v${CLIENT_VERSION}/${client}"
 done
 
 for arch in x64 arm64; do

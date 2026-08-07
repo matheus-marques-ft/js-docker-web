@@ -1,6 +1,6 @@
 ARG VERSION=dev
-FROM jumpserver/lina:${VERSION} AS lina
-FROM jumpserver/luna:${VERSION} AS luna
+FROM ghcr.io/matheus-marques-ft/lina:${VERSION} AS lina
+FROM ghcr.io/matheus-marques-ft/luna:${VERSION} AS luna
 
 FROM nginx:1.31-trixie
 ARG TARGETARCH

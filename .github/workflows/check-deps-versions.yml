@@ -11,7 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ secrets.PRIVATE_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         branch: [dev]
@@ -51,8 +51,9 @@ jobs:
 
       - name: Check client version
         run: |
-          version=$(curl -s https://api.github.com/repos/jumpserver/clients/releases/latest | jq -r .tag_name)
-          sed -i "s/Client_VERSION=.*/Client_VERSION=${version}/g" versions.txt
+          version=$(curl -s https://api.github.com/repos/matheus-marques-ft/js-client/releases/latest | jq -r .tag_name)
+          version=${version#v}
+          sed -i "s/CLIENT_VERSION=.*/CLIENT_VERSION=${version}/g" versions.txt
 
       - name: Check tinker version
         run: |

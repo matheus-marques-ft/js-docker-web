@@ -25,9 +25,9 @@ group "default" {
 
 
 target "lina" {
-    context = "https://github.com/jumpserver/lina.git#${LINA_BRANCH}"
+    context = "https://github.com/matheus-marques-ft/js-lina.git#${LINA_BRANCH}"
     dockerfile = "Dockerfile"
-    tags = ["jumpserver/lina:${VERSION}"]
+    tags = ["ghcr.io/matheus-marques-ft/lina:${VERSION}"]
     output = ["type=docker"]
     args = {
         VERSION = "${VERSION}"
@@ -36,8 +36,8 @@ target "lina" {
 
 target "luna" {
     dockerfile = "Dockerfile"
-    context = "https://github.com/jumpserver/luna.git#${LUNA_BRANCH}"
-    tags = ["jumpserver/luna:${VERSION}"]
+    context = "https://github.com/matheus-marques-ft/js-luna.git#${LUNA_BRANCH}"
+    tags = ["ghcr.io/matheus-marques-ft/luna:${VERSION}"]
     output = ["type=docker"]
     args = {
         VERSION = "${VERSION}"
@@ -48,28 +48,17 @@ target "luna" {
 target "ce" {
     context = "."
     dockerfile = "Dockerfile"
-    tags = ["jumpserver/web:${VERSION}-ce"]
+    tags = [
+        "ghcr.io/matheus-marques-ft/web:${VERSION}-ce",
+        "ghcr.io/matheus-marques-ft/web:${VERSION}",
+    ]
     output = PUSH_ENABLED ? ["type=registry"] : ["type=docker"]
     args = {
         VERSION = "${VERSION}"
     }
     contexts = {
-        "jumpserver/lina:${VERSION}" = "target:lina"
-        "jumpserver/luna:${VERSION}" = "target:luna"
-    }
-    VERSION = "${VERSION}"
-}
-
-target "ee" {
-    context = "."
-    dockerfile = "Dockerfile-ee"
-    tags = ["jumpserver/web:${VERSION}-ee"]
-    output = PUSH_ENABLED ? ["type=registry"] : ["type=docker"]
-    args = {
-        VERSION = "${VERSION}"
-    }
-    contexts = {
-        "jumpserver/web:${VERSION}-ce" = "target:ce"
+        "ghcr.io/matheus-marques-ft/lina:${VERSION}" = "target:lina"
+        "ghcr.io/matheus-marques-ft/luna:${VERSION}" = "target:luna"
     }
     VERSION = "${VERSION}"
 }
