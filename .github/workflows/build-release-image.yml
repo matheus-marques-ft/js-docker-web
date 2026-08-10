@@ -13,11 +13,11 @@ on:
       LINA_BRANCH:
         description: 'js-lina branch/tag to build from'
         required: false
-        default: 'dev'
+        default: 'main'
       LUNA_BRANCH:
         description: 'js-luna branch/tag to build from'
         required: false
-        default: 'dev'
+        default: 'main'
 
 jobs:
   build-and-push:
@@ -51,7 +51,7 @@ jobs:
       - name: Build and push web image via bake
         env:
           VERSION: ${{ steps.vars.outputs.version }}
-          LINA_BRANCH: ${{ github.event.inputs.LINA_BRANCH || 'dev' }}
-          LUNA_BRANCH: ${{ github.event.inputs.LUNA_BRANCH || 'dev' }}
+          LINA_BRANCH: ${{ github.event.inputs.LINA_BRANCH || 'main' }}
+          LUNA_BRANCH: ${{ github.event.inputs.LUNA_BRANCH || 'main' }}
           PUSH_ENABLED: "true"
         run: docker buildx bake ce

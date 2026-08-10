@@ -7,11 +7,11 @@ variable "BUILD_ARM" {
 }
 
 variable "LUNA_BRANCH" {
-    default = "dev"
+    default = "main"
 }
 
 variable "LINA_BRANCH" {
-    default = "dev"
+    default = "main"
 }
 
 variable "PUSH_ENABLED" {
