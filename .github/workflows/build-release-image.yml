@@ -11,13 +11,13 @@ on:
         required: false
         default: ''
       LINA_BRANCH:
-        description: 'js-lina branch/tag to build from'
+        description: 'js-lina branch/tag to build from (default: dev for normal tags, main for -stable tags)'
         required: false
-        default: 'main'
+        default: ''
       LUNA_BRANCH:
-        description: 'js-luna branch/tag to build from'
+        description: 'js-luna branch/tag to build from (default: dev for normal tags, main for -stable tags)'
         required: false
-        default: 'main'
+        default: ''
 
 jobs:
   build-and-push:
@@ -38,6 +38,22 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+          # -stable tags come from the dev->main production promotion, so
+          # assemble lina/luna from their main; any other tag is a dev
+          # pre-release, so assemble from their dev.
+          LINA_BRANCH="${{ github.event.inputs.LINA_BRANCH }}"
+          LUNA_BRANCH="${{ github.event.inputs.LUNA_BRANCH }}"
+          if [[ -z "${LINA_BRANCH}" || -z "${LUNA_BRANCH}" ]]; then
+            case "${VERSION}" in
+              *-stable) DEFAULT_BRANCH="main" ;;
+              *)        DEFAULT_BRANCH="dev" ;;
+            esac
+            [ -z "${LINA_BRANCH}" ] && LINA_BRANCH="${DEFAULT_BRANCH}"
+            [ -z "${LUNA_BRANCH}" ] && LUNA_BRANCH="${DEFAULT_BRANCH}"
+          fi
+          echo "lina_branch=${LINA_BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "luna_branch=${LUNA_BRANCH}" >> "$GITHUB_OUTPUT"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -51,7 +67,7 @@ jobs:
       - name: Build and push web image via bake
         env:
           VERSION: ${{ steps.vars.outputs.version }}
-          LINA_BRANCH: ${{ github.event.inputs.LINA_BRANCH || 'main' }}
-          LUNA_BRANCH: ${{ github.event.inputs.LUNA_BRANCH || 'main' }}
+          LINA_BRANCH: ${{ steps.vars.outputs.lina_branch }}
+          LUNA_BRANCH: ${{ steps.vars.outputs.luna_branch }}
           PUSH_ENABLED: "true"
         run: docker buildx bake ce
