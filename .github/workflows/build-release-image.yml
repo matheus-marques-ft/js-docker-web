@@ -64,6 +64,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Authenticate git for private lina/luna bake contexts
+        # docker-bake.hcl fetches js-lina/js-luna as remote git build contexts.
+        # Both are private repos, and the default GITHUB_TOKEN has no access
+        # outside this repo, so that fetch 401s. RELEASE_PAT (already used for
+        # cross-repo tagging elsewhere) does have access to both.
+        run: |
+          git config --global url."https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/".insteadOf "https://github.com/"
+
       - name: Build and push web image via bake
         env:
           VERSION: ${{ steps.vars.outputs.version }}
