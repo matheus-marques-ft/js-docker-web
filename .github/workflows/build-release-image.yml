@@ -64,18 +64,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Authenticate git for private lina/luna bake contexts
-        # docker-bake.hcl fetches js-lina/js-luna as remote git build contexts.
-        # Both are private repos, and the default GITHUB_TOKEN has no access
-        # outside this repo, so that fetch 401s. RELEASE_PAT (already used for
-        # cross-repo tagging elsewhere) does have access to both.
-        run: |
-          git config --global url."https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/".insteadOf "https://github.com/"
-
       - name: Build and push web image via bake
+        # docker-bake.hcl fetches js-lina/js-luna as remote git build contexts,
+        # and both are private repos. The buildx driver here is
+        # "docker-container", so BuildKit fetches those git contexts *inside
+        # its own builder container* - it never sees the runner's
+        # ~/.gitconfig, so a `git config --global insteadOf` on the runner
+        # (tried before) has no effect there. BuildKit's git source does
+        # support auth for this exact case via the reserved GIT_AUTH_TOKEN
+        # secret, which crosses the container boundary correctly.
         env:
           VERSION: ${{ steps.vars.outputs.version }}
           LINA_BRANCH: ${{ steps.vars.outputs.lina_branch }}
           LUNA_BRANCH: ${{ steps.vars.outputs.luna_branch }}
           PUSH_ENABLED: "true"
-        run: docker buildx bake ce
+          GIT_AUTH_TOKEN: ${{ secrets.RELEASE_PAT }}
+        run: docker buildx bake ce --secret id=GIT_AUTH_TOKEN,env=GIT_AUTH_TOKEN
