@@ -32,6 +32,9 @@ target "lina" {
     args = {
         VERSION = "${VERSION}"
     }
+    # js-lina is private; BuildKit's git source reads this reserved secret to
+    # authenticate the remote git-context fetch (see build-release-image.yml).
+    secret = ["id=GIT_AUTH_TOKEN,env=GIT_AUTH_TOKEN"]
 }
 
 target "luna" {
@@ -42,6 +45,7 @@ target "luna" {
     args = {
         VERSION = "${VERSION}"
     }
+    secret = ["id=GIT_AUTH_TOKEN,env=GIT_AUTH_TOKEN"]
 }
 
 

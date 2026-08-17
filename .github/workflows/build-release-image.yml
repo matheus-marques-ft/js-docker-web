@@ -79,4 +79,4 @@ jobs:
           LUNA_BRANCH: ${{ steps.vars.outputs.luna_branch }}
           PUSH_ENABLED: "true"
           GIT_AUTH_TOKEN: ${{ secrets.RELEASE_PAT }}
-        run: docker buildx bake ce --secret id=GIT_AUTH_TOKEN,env=GIT_AUTH_TOKEN
+        run: docker buildx bake ce
