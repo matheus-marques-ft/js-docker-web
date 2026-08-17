@@ -10,6 +10,8 @@ name: Check Dependencies Versions
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -51,7 +53,12 @@ jobs:
 
       - name: Check client version
         run: |
-          version=$(curl -s https://api.github.com/repos/matheus-marques-ft/js-client/releases/latest | jq -r .tag_name)
+          # js-client is private and every one of its releases is created as a
+          # draft (see js-client/build.yml) - GitHub's /releases/latest endpoint
+          # excludes drafts (and 404s on a private repo without auth), so it
+          # never resolves here. List releases instead (authenticated) and take
+          # the newest one.
+          version=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/matheus-marques-ft/js-client/releases | jq -r '.[0].tag_name')
           version=${version#v}
           sed -i "s/CLIENT_VERSION=.*/CLIENT_VERSION=${version}/g" versions.txt
 

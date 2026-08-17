@@ -9,6 +9,7 @@ on:
       - "versions.txt"
       - "prepare.sh"
       - "Dockerfile-static"
+  workflow_dispatch:
 
 jobs:
   build-and-push:
