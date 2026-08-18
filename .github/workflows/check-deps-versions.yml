@@ -10,6 +10,8 @@ name: Check Dependencies Versions
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -50,8 +52,17 @@ jobs:
           fi
 
       - name: Check client version
+        env:
+          # js-client is a different private repo - the default GITHUB_TOKEN
+          # only has access to this repo, so a cross-repo call needs RELEASE_PAT
+          # (same cross-repo token used for tagging elsewhere in this fork).
+          RELEASE_PAT: ${{ secrets.RELEASE_PAT }}
         run: |
-          version=$(curl -s https://api.github.com/repos/matheus-marques-ft/js-client/releases/latest | jq -r .tag_name)
+          # Every js-client release is created as a draft (see js-client/build.yml)
+          # - GitHub's /releases/latest endpoint excludes drafts, so it never
+          # resolves here. List releases instead (authenticated) and take the
+          # newest one.
+          version=$(curl -s -H "Authorization: token $RELEASE_PAT" https://api.github.com/repos/matheus-marques-ft/js-client/releases | jq -r '.[0].tag_name')
           version=${version#v}
           sed -i "s/CLIENT_VERSION=.*/CLIENT_VERSION=${version}/g" versions.txt
 
