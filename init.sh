@@ -71,7 +71,7 @@ function config_https() {
 
   config_nginx "${config_file}"
 
-  sed -i "s@server web:.*;@server localhost:51980;@g" "${config_file}"
+  sed -i "s@server web:[^;]*;@server localhost:51980;@g" "${config_file}"
   sed -i 's@https://$server_name$request_uri;@https://$host$request_uri;@g' "${config_file}"
 
   if [ "${USE_IPV6}" == "1" ]; then
